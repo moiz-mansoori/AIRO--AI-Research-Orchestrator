@@ -29,9 +29,11 @@ reports/*/
 logs/*.log
 !logs/.gitkeep
 
-# MLflow
+# MLflow / Tracking DB
 mlruns/
 mlartifacts/
+*.db
+*.sqlite
 
 # Jupyter
 .ipynb_checkpoints/
