@@ -1,0 +1,39 @@
+# dev.txt — Development, testing, and optional production tools
+# Install: pip install -r dev.txt
+# Requires: core.txt + ml.txt + agents.txt first.
+#
+# Nothing in this file is required to RUN the pipeline.
+# All items here are either dev-only or optional production enhancements.
+
+# Testing 
+pytest>=8.3.0               # Test runner (3 test files: critic, data, evaluator, integration)
+pytest-mock>=3.14.0         # Mocking Claude API calls in tests (no real API key needed)
+pytest-asyncio>=0.24.0      # Async test support (for future async agent calls)
+pytest-cov>=5.0.0           # Coverage reports: `pytest --cov=agents --cov=orchestrator`
+
+# Code quality 
+ruff>=0.6.0                 # Linter + formatter (replaces flake8 + black + isort)
+mypy>=1.11.0                # Static type checking (strict mode enabled in pyproject.toml)
+
+# Notebooks 
+ipykernel>=6.29.0           # Jupyter kernel for data exploration notebooks
+
+# Optional: PDF report generation 
+# WeasyPrint is used in tools/report_tools.py with a lazy import + try/except.
+# The pipeline runs fine without it — PDF export is silently skipped and only
+# the Markdown report is produced. Install this for full PDF output.
+# NOTE: WeasyPrint requires system packages: libpango, libcairo, libgdk-pixbuf
+#   Ubuntu/Debian: sudo apt install libpango-1.0-0 libcairo2 libgdk-pixbuf2.0-0
+weasyprint>=62.0            # Markdown → HTML → PDF conversion for experiment reports
+
+# Optional: Hyperparameter search (Config Agent v2) 
+# optuna is NOT yet implemented in the codebase. The Config Agent currently
+# uses Claude to reason about configs. Add this when upgrading to Optuna-backed
+# search spaces for exhaustive budget experiments.
+optuna>=3.6.0               # Bayesian hyperparameter optimisation (planned — not active)
+
+# Optional: Extra tree framework 
+# LightGBM is referenced as a string in MODEL_REGISTRY (training_agent.py) with
+# a try/except guard. It works as a bonus if installed but is not required.
+# XGBoost is the primary framework and sufficient for all current experiments.
+lightgbm>=4.5.0             # Optional extra gradient boosting framework

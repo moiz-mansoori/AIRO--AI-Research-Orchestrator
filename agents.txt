@@ -1,0 +1,16 @@
+# agents.txt — LLM & agent orchestration stack
+# Install: pip install -r agents.txt
+# Requires: core.txt must be installed first.
+#
+# Why only 3 packages?
+#   - langchain-groq omitted: the codebase uses the `groq` SDK
+#     directly (tools/llm_tools.py). ChatGroq logic is never called.
+#   - langchain is kept: it is a hard transitive dependency of langgraph
+#     and listed explicitly for version-pinning clarity.
+
+# Orchestration 
+langgraph>=0.2.0            # Stateful multi-agent graph (StateGraph, conditional edges)
+langchain>=0.3.0            # Base chain primitives; hard transitive dep of langgraph
+
+# LLM provider 
+groq>=0.11.0                # Groq API: config generation, reasoning, report narration

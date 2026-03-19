@@ -1,0 +1,29 @@
+# ml.txt — Machine learning & experiment tracking stack
+# Install: pip install -r ml.txt
+# Requires: core.txt must be installed first.
+#
+# Framework decision: scikit-learn + XGBoost only.
+#   - torch removed:     never imported in any source file (~2-3 GB saved)
+#   - lightgbm removed:  XGBoost covers the same use case; only appeared as
+#                        string references in config dicts, not actual imports
+#   - seaborn removed:   never imported anywhere; matplotlib handles all plots
+#   - great-expectations removed: never imported; pandera or manual checks used instead
+
+# Core ML 
+scikit-learn>=1.5.0     # LogisticRegression, RandomForest, MLP, SVC, metrics, splits
+xgboost>=2.1.0          # High-performance gradient boosting (primary tree framework)
+
+# Experiment tracking 
+mlflow>=2.16.0          # Run logging, param/metric tracking, model registry, artifacts
+
+# Explainability 
+shap>=0.46.0            # SHAP values, TreeExplainer, summary plots for best model
+
+# Visualisation 
+matplotlib>=3.9.0       # Learning curve plots, SHAP plots (only viz lib actually imported)
+
+# Data versioning 
+# NOTE: DVC is a CLI tool, not a Python import. Install it as a system package
+# or via pip. The code calls `dvc add` via subprocess and reads .dvc files.
+# If DVC is unavailable, the pipeline gracefully falls back to SHA-256 hashing.
+dvc>=3.50.0             # Artifact versioning for cleaned datasets

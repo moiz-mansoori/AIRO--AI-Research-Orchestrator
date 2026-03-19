@@ -1,0 +1,6 @@
+# Main requirements file for production
+# Points to the optimized, split requirement files
+
+-r core.txt
+-r ml.txt
+-r agents.txt

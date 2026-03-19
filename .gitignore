@@ -1,0 +1,47 @@
+# Environment
+.env
+.venv/
+venv/
+airovenv/
+.airovenv/
+__pycache__/
+*.pyc
+*.pyo
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Data & models (track with DVC instead)
+data/raw/*
+data/processed/*
+data/splits/*
+models/*/
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/splits/.gitkeep
+!models/.gitkeep
+
+# Reports (generated artifacts)
+reports/*/
+!reports/.gitkeep
+
+# Logs
+logs/*.log
+!logs/.gitkeep
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+*.egg-info/
