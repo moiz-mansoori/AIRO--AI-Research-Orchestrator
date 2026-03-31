@@ -15,15 +15,16 @@ __pycache__/
 data/raw/*
 data/processed/*
 data/splits/*
-models/*/
+models/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/splits/.gitkeep
 !models/.gitkeep
 
 # Reports (generated artifacts)
-reports/*/
+reports/*
 !reports/.gitkeep
+project_report.txt
 
 # Logs
 logs/*.log

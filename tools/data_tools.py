@@ -132,13 +132,27 @@ def split_dataset(
 
     stratify = y if task_type == TaskType.CLASSIFICATION else None
 
-    X_train, X_tmp, y_train, y_tmp = train_test_split(
-        X, y, test_size=0.30, random_state=random_state, stratify=stratify
-    )
-    stratify2 = y_tmp if task_type == TaskType.CLASSIFICATION else None
-    X_val, X_test, y_val, y_test = train_test_split(
-        X_tmp, y_tmp, test_size=0.50, random_state=random_state, stratify=stratify2
-    )
+    try:
+        X_train, X_tmp, y_train, y_tmp = train_test_split(
+            X, y, test_size=0.30, random_state=random_state, stratify=stratify
+        )
+    except ValueError as e:
+        logger.warning(f"Stratified split failed ({e}) — falling back to random split.")
+        stratify = None
+        X_train, X_tmp, y_train, y_tmp = train_test_split(
+            X, y, test_size=0.30, random_state=random_state, stratify=None
+        )
+
+    stratify2 = y_tmp if stratify is not None and task_type == TaskType.CLASSIFICATION else None
+    try:
+        X_val, X_test, y_val, y_test = train_test_split(
+            X_tmp, y_tmp, test_size=0.50, random_state=random_state, stratify=stratify2
+        )
+    except ValueError:
+        logger.warning(f"Stratified secondary split failed — falling back to random split.")
+        X_val, X_test, y_val, y_test = train_test_split(
+            X_tmp, y_tmp, test_size=0.50, random_state=random_state, stratify=None
+        )
 
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)

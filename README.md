@@ -1,81 +1,81 @@
-# 🤖 Meet AIRO — Your AI Research Orchestrator
+# Meet AIRO — Your AI Research Orchestrator
 
 > **"Hi, I'm AIRO. I'm a multi-agent system that works like a Senior Data Science team. Give me a dataset, and my specialized agents will clean it, design an experiment, train dozens of models in parallel, audit them for issues, and hand you a production-ready PDF report."**
 
-AIRO automates the entire machine learning experimentation workflow using an orchestration of **six humanoid-inspired agents** that coordinate end-to-end — from raw data to a polished, reproducible report — with no paid API required.
+AIRO automates the entire machine learning experimentation workflow using an orchestration of **six autonomous agents** that coordinate end-to-end — from raw data to a polished, reproducible report — with no paid API required.
 
 ---
 
-## 🧠 Meet The Team (Architecture)
+## Architecture
 
 I use **LangGraph** to coordinate it. Here is how we work together when you upload a dataset:
 
 ```mermaid
 graph TD
-    User([👤 You]) -- Uploads Dataset --> Data[🧹 Data Agent]
+    User([You]) -- Uploads Dataset --> Data[Data Agent]
     
     subgraph AIRO's Brain
-        Data -- Cleaned Data & Splits --> Config[🧠 Config Agent]
-        Config -- Hyperparameter Ideas --> Train[⚙️ Training Agents]
-        Train -- Trained Models --> Critic[🧐 Critic Agent]
-        Critic -- Audit Pass/Fail --> Eval[🏆 Evaluator Agent]
-        Eval -- Leaderboard Rankings --> Report[📄 Reporter Agent]
+        Data -- Cleaned Data & Splits --> Config[Config Agent]
+        Config -- Hyperparameter Ideas --> Train[Training Agents]
+        Train -- Trained Models --> Critic[Critic Agent]
+        Critic -- Audit Pass/Fail --> Eval[Evaluator Agent]
+        Eval -- Leaderboard Rankings --> Report[Reporter Agent]
     end
     
     Report -- "PDF/Markdown Report & SHAP" --> User
 ```
 
 ### The Agents & Their Roles
-1. 🧹 **Data Agent (The Cleaner):** "I ingest, validate, and cleanse your data. Missing values? Gone. Categoricals? Encoded. Then I create stratified train/val/test splits."
-2. 🧠 **Config Agent (The Architect):** "I brainstorm the best architectures and hyperparameters for your specific problem using Groq LLaMA models. I think outside the box."
-3. ⚙️ **Training Agents (The Engine):** "We spin up a ThreadPoolExecutor and train all those configs in parallel. Heavy lifting is our specialty."
-4. 🧐 **Critic Agent (The Reviewer):** "I audit every model. Overfitting? Data leakage? Suspicious metrics? I'll find it, flag it, and fail the model before it reaches production."
-5. 🏆 **Evaluator Agent (The Judge):** "I rank the surviving models on a leaderboard and calculate exactly how much better we did than a naive baseline."
-6. 📄 **Reporter Agent (The Analyst):** "I compile the entire experiment into a beautiful PDF and Markdown report, complete with SHAP explainability plots and executive recommendations."
+1. **Data Agent:** "I ingest, validate, and cleanse your data. Missing values? Gone. Categoricals? Encoded. Then I create stratified train/val/test splits."
+2. **Config Agent:** "I brainstorm the best architectures and hyperparameters for your specific problem using Groq LLaMA models. I think outside the box."
+3. **Training Agents:** "We spin up a ThreadPoolExecutor and train all those configs in parallel. Heavy lifting is our specialty."
+4. **Critic Agent:** "I audit every model. Overfitting? Data leakage? Suspicious metrics? I'll find it, flag it, and fail the model before it reaches production."
+5. **Evaluator Agent:** "I rank the surviving models on a leaderboard and calculate exactly how much better we did than a naive baseline."
+6. **Reporter Agent:** "I compile the entire experiment into a beautiful PDF and Markdown report, complete with SHAP explainability plots and executive recommendations."
 
 ---
 
-## 📂 Inside My Brain (File Structure)
+## 📂 File Structure
 
-Here is how my mind is organized under the hood:
+Here is how the project is organized under the hood:
 
 ```text
 AIRO/
-├── orchestrator/           # 🧠 My Central Nervous System (LangGraph)
-│   ├── graph.py            # The StateGraph routing logic connecting my agents
+├── orchestrator/           # LangGraph orchestration and state management
+│   ├── graph.py            # The StateGraph routing logic 
 │   ├── router.py           # Conditional routing (error handling & retries)
-│   ├── runner.py           # The CLI entrypoint (how you talk to me)
-│   └── state.py            # AIROState — my shared memory across all agents
+│   ├── runner.py           # The CLI entrypoint
+│   └── state.py            # AIROState — shared memory across all agents
 │
-├── agents/                 # 🤖 My Specialized Team
-│   ├── data_agent.py       # (🧹 The Cleaner)
-│   ├── config_agent.py     # (🧠 The Architect - generates configurations)
-│   ├── training_agent.py   # (⚙️ The Engine - parallel model fitting)
-│   ├── critic_agent.py     # (🧐 The Reviewer - algorithmic auditing)
-│   ├── evaluator_agent.py  # (🏆 The Judge - baseline comparison & ranking)
-│   └── reporter_agent.py   # (📄 The Analyst - Markdown/PDF writing)
+├── agents/                 # Autonomous agent implementations
+│   ├── data_agent.py       
+│   ├── config_agent.py     
+│   ├── training_agent.py   
+│   ├── critic_agent.py     
+│   ├── evaluator_agent.py  
+│   └── reporter_agent.py   
 │
-├── tools/                  # 🛠️ My Utility Belt
-│   ├── data_tools.py       # Pandas wrangling, Scikit-learn encoding, DVC versioning
+├── tools/                  # Utility functions and API wrappers
+│   ├── data_tools.py       # Pandas wrangling, Scikit-learn encoding, DVC
 │   ├── llm_tools.py        # Groq API wrappers with retry mechanisms
-│   ├── metrics_tools.py    # Unified metric calculation (classification & regression)
+│   ├── metrics_tools.py    # Unified metric calculation
 │   ├── mlflow_tools.py     # SQLite DB tracking for run management
 │   ├── shap_tools.py       # Explainability and feature importance plotting
 │   └── report_tools.py     # Jinja2 templating → Custom PDF rendering
 │
-├── frontend/               # 🖥️ My Face (The UI)
+├── frontend/               # Streamlit application dashboard
 │   ├── app.py              # Streamlit Multi-Page dashboard entry point
 │   ├── components/         # Shared UI pieces (Theme CSS, Sidebar)
 │   └── pages/              # Run Exp, Live Trace, Leaderboard, Report Viewer
 │
-├── data/                   # 💾 Where I store your files
+├── data/                   # Dataset storage
 │   ├── raw/                # Drop datasets here
-│   ├── processed/          # My cleaned, DVC-hashed artifacts
+│   ├── processed/          # Cleaned, DVC-hashed artifacts
 │   └── splits/             # Train / val / test parquet files
 │
-├── reports/                # 📊 Output directory (Your final PDFs and Logs)
-├── models/                 # ⚙️ Saved .pkl weights from winning experiments
-└── tests/                  # 🧪 Automated test suites covering my logic
+├── reports/                # Final generated Markdown and PDF reports
+├── models/                 # Serialized .pkl weights from top models
+└── tests/                  # Automated Pytest test suites
 ```
 
 ---
@@ -114,9 +114,16 @@ Prefer a UI? Launch my Streamlit dashboard:
 streamlit run frontend/app.py
 ```
 
+### 5. View experiment tracking (MLflow UI)
+```bash
+# No server needed — just point MLflow at the SQLite database
+mlflow ui --backend-store-uri sqlite:///mlruns.db
+# Then open: http://localhost:5000
+```
+
 ---
 
-## ⚡ Make Me Faster
+## ⚡ Performance Tuning
 
 I run fast by default. But if you're impatient or running on a lower-end machine, you can tweak my `.env` file settings:
 
@@ -129,7 +136,7 @@ I run fast by default. But if you're impatient or running on a lower-end machine
 
 ---
 
-## 🆓 Free LLM Options
+## LLM Configuration Options
 
 I don't require expensive APIs. You can power my reasoning engine with any of these **100% free** options:
 
@@ -160,7 +167,7 @@ OLLAMA_BASE_URL=http://localhost:11434
 
 ---
 
-## 🛠️ My Tech Stack
+## Tech Stack
 
 I am built entirely on modern, production-ready python tooling:
 
@@ -172,6 +179,16 @@ I am built entirely on modern, production-ready python tooling:
 *   **Explainability:** SHAP
 *   **Report Generation:** Jinja2 & WeasyPrint
 *   **Testing:** Pytest & Pytest-Mock
+
+---
+
+## 🐛 Troubleshooting
+
+**How do I view MLflow runs?**
+→ Run `mlflow ui --backend-store-uri sqlite:///mlruns.db` from the project root. Open http://localhost:5000 in your browser. No server setup required — the SQLite file is created automatically.
+
+**Why are all my models getting a WARN verdict from the Critic Agent?**
+→ The Critic agent consistently detects overfitting on small datasets — a known limitation of tree-based models on 768-row tabular data without regularization tuning. This is intended ML behavior, not a bug!
 
 ---
 

@@ -9,7 +9,7 @@ from orchestrator.state import (
 )
 
 # Thresholds — tune per project needs
-OVERFIT_THRESHOLD    = 0.15   # train - val gap
+OVERFIT_THRESHOLD    = 0.20   # train - val gap
 LEAKAGE_THRESHOLD    = 0.05   # val - train gap (val suspiciously better)
 MIN_TEST_SAMPLES     = 100
 
@@ -96,6 +96,8 @@ def critic_agent_node(state: AIROState) -> AIROState:
         PipelineAction.REGENERATE_CONFIGS if all_failed
         else PipelineAction.CONTINUE
     )
+    if all_failed:
+        state.retry_count += 1
 
     state.log_timing("critic", time.perf_counter() - t0)
     return state

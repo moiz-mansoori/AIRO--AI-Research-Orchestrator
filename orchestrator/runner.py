@@ -13,7 +13,11 @@ from rich.table import Table
 from orchestrator.graph import compile_graph
 from orchestrator.state import AIROState, ComputeBudget, TaskType
 
-load_dotenv()  
+load_dotenv()
+
+# Route logs to file so Live Trace can see them
+Path("logs").mkdir(exist_ok=True)
+logger.add("logs/airo.log", mode="w", enqueue=True)
 
 app = typer.Typer(
     name="airo",

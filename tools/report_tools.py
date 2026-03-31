@@ -1,6 +1,5 @@
 """
 AIRO — tools/report_tools.py
-Markdown + PDF report generation using Jinja2 and WeasyPrint.
 """
 from __future__ import annotations
 
@@ -16,7 +15,7 @@ REPORT_TEMPLATE = """
 # AIRO Experiment Report
 **Experiment ID:** {{ state.experiment_id }}
 **Generated:** {{ generated_at }}
-**Task:** {{ state.task_type | upper }}  ·  **Dataset:** {{ state.dataset_path }}
+**Task:** {{ state.task_type | upper }}  ·  **Dataset:** {{ state.dataset_path | replace('\\', '/') | split('/') | last }}
 
 ---
 
@@ -86,10 +85,11 @@ REPORT_TEMPLATE = """
 
 ## 6. Critic Audit Summary
 
-| Run ID | Verdict | Issues |
-|---|---|---|
-{% for r in state.critic_results %}
-| {{ r.run_id[:8] }}... | {{ r.verdict }} | {{ r.issues | join('; ') if r.issues else 'None' }} |
+| Rank | Model | Verdict | Issues | Recommendation |
+|---|---|---|---|---|
+{% for entry in state.leaderboard %}
+{% set critic = state.critic_results | selectattr('run_id', 'eq', entry.run_id) | first %}
+| {{ entry.rank }} | {{ entry.model_type }} | {{ critic.verdict if critic else 'N/A' }} | {{ critic.issues | join('; ') if critic and critic.issues else 'None' }} | {{ critic.recommendations[0] if critic and critic.recommendations else '—' }} |
 {% endfor %}
 
 ---

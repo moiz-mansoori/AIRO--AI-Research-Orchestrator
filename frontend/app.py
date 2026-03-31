@@ -34,7 +34,7 @@ st.markdown("""
     }
 
     /* ── D. Hide Streamlit branding ── */
-    #MainMenu, footer, header { visibility: hidden; }
+    #MainMenu, footer { visibility: hidden; }
     [data-testid="stDecoration"] { display: none; }
 
     /* ── E. Sidebar base ── */

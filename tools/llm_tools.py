@@ -92,7 +92,7 @@ Each config must have these exact keys:
 
 Allowed model_type values:
   LogisticRegression, RandomForestClassifier, RandomForestRegressor,
-  XGBClassifier, XGBRegressor, LGBMClassifier, LGBMRegressor, MLPClassifier, MLPRegressor
+  XGBClassifier, XGBRegressor, MLPClassifier, MLPRegressor
 
 Respond with ONLY the JSON array. No prose, no markdown fences.
 """
@@ -126,7 +126,29 @@ def call_llm_for_report_narrative(
     context: dict,
 ) -> str:
     """Generate a specific report section narrative."""
-    prompt = f"""
+    if section == 'executive_summary':
+        prompt = f"""
+Write the executive summary of an ML experiment report in exactly 3 sentences.
+
+Context:
+  Best model: {context.get('best_model', 'N/A')}
+  Primary metric ({context.get('metric', 'N/A')}): {context.get('metric_value', 'N/A')}
+  Improvement over baseline: {context.get('improvement', 0)}
+  Number of experiments: {context.get('n_experiments', 0)}
+  Task type: {context.get('task_type', 'N/A')}
+
+Rules:
+  - 3 sentences maximum. No more.
+  - Every sentence must reference a specific number from the context above.
+  - Do not use phrases like: "suggests its suitability", "strong performance",
+    "solid foundation", "demonstrates the effectiveness", "key findings",
+    "experimental approach", or any other generic filler.
+  - Write like a data scientist reporting to a colleague. Terse and precise.
+  - State the best model name, its exact metric value, and the improvement
+    over baseline explicitly.
+"""
+    else:
+        prompt = f"""
 Write the '{section}' section of an ML experiment report.
 
 Context data:
@@ -136,7 +158,7 @@ Rules:
 - Be concise and precise.
 - Every claim must reference the provided data.
 - No fabricated numbers.
-- {'Keep it under 150 words.' if section == 'executive_summary' else 'Aim for 100-200 words.'}
+- Aim for 100-200 words.
 """
     return call_llm(prompt, max_tokens=400)
 

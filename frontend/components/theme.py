@@ -15,7 +15,7 @@ def inject_theme_css():
 
         .main .block-container { padding: 2rem 2.5rem 3rem; max-width: 1100px; }
 
-        #MainMenu, footer, header { visibility: hidden; }
+        #MainMenu, footer { visibility: hidden; }
         [data-testid="stDecoration"] { display: none; }
 
         [data-testid="stSidebar"] {

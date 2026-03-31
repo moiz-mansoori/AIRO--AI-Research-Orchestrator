@@ -98,11 +98,17 @@ def evaluator_agent_node(state: AIROState) -> AIROState:
                 improvement_pct=state.improvement_over_baseline_pct,
                 leaderboard_summary=lb_summary
             )
-        except Exception as e:
-            logger.warning(f"[evaluator] LLM reasoning failed: {e}")
+        except Exception as exc:
+            import traceback
+            logger.warning(
+                f"[evaluator] LLM selection reasoning failed — "
+                f"type={type(exc).__name__} msg={exc}. "
+                f"Using fallback string. Full trace:\n{traceback.format_exc()}"
+            )
             state.selection_reasoning = (
-                f"{best.model_type} selected as best model with "
-                f"{metric}={best.primary_metric:.4f}."
+                f"{best.model_type} ranked #1 with {metric}={best.primary_metric:.4f} "
+                f"across {len(state.leaderboard)} evaluated models "
+                f"({state.improvement_over_baseline_pct:+.1f}% vs baseline)."
             )
 
     from tools.report_tools import save_leaderboard_csv
