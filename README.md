@@ -1,6 +1,6 @@
 # Meet AIRO — Your AI Research Orchestrator
 
-> **"Hi, I'm AIRO. I'm a multi-agent system that works like a Senior Data Science team. Give me a dataset, and my specialized agents will clean it, design an experiment, train dozens of models in parallel, audit them for issues, and hand you a production-ready PDF report."**
+> **"Hello, I'm AIRO. I'm a multi-agent system that works like a Senior Data Science team. Give me a dataset, and my specialized agents will clean it, design an experiment, train dozens of models in parallel, audit them for issues, and hand you a production-ready PDF report."**
 
 AIRO automates the entire machine learning experimentation workflow using an orchestration of **six autonomous agents** that coordinate end-to-end — from raw data to a polished, reproducible report — with no paid API required.
 
@@ -192,4 +192,4 @@ I am built entirely on modern, production-ready python tooling:
 
 ---
 
-**Feel free to clone, use, and collaborate! Pull requests are always welcome.** 🤝
+**Feel free to clone, use, and collaborate! Pull requests are always welcome.** 
