@@ -15,7 +15,7 @@ REPORT_TEMPLATE = """
 # AIRO Experiment Report
 **Experiment ID:** {{ state.experiment_id }}
 **Generated:** {{ generated_at }}
-**Task:** {{ state.task_type | upper }}  ·  **Dataset:** {{ state.dataset_path | replace('\\', '/') | split('/') | last }}
+**Task:** {{ state.task_type | upper }}  ·  **Dataset:** {{ dataset_name }}
 
 ---
 
@@ -133,8 +133,11 @@ def render_markdown(
     seeds = list({c.random_seed for c in state.configs})
     metric_name = state.primary_metric_name()
 
+    dataset_name = os.path.basename(state.dataset_path) if state.dataset_path else "unknown"
+
     return template.render(
         state=state,
+        dataset_name=dataset_name,
         generated_at=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         executive_summary=executive_summary,
         top_features=top_features,
