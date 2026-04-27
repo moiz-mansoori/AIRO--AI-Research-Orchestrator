@@ -17,6 +17,7 @@ python-dotenv>=1.0.0    # Loading GROQ_API_KEY and all AIRO_* env vars
 # Templating & reporting 
 jinja2>=3.1.0           # Renders the Markdown experiment report template
 markdown>=3.7.0         # Converts Markdown → HTML for WeasyPrint PDF pipeline
+weasyprint>=62.0        # Generates the final PDF report
 
 # CLI & logging 
 rich>=13.8.0            # Formatted CLI output: tables, panels, progress bars
