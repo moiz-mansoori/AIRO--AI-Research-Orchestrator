@@ -17,7 +17,7 @@ app = FastAPI(title="AIRO API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=["*"], # Allow Vercel frontend to communicate with Render backend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
