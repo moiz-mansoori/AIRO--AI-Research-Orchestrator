@@ -63,6 +63,7 @@ mlartifacts/
 # Reports
 reports/*
 !reports/.gitkeep
+project_report.txt
 
 # Logs
 logs/*.log

@@ -1,0 +1,42 @@
+.git
+.venv/
+venv/
+airovenv/
+.airovenv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Ignore Next.js frontend code (deployed separately to Vercel)
+airo-frontend/
+
+# Ignore local environments & secrets
+.env
+.env.*
+secrets.json
+credentials.json
+client_secret.json
+*.pem
+
+# Ignore dynamic storage folders (Render should start fresh)
+data/raw/*
+data/processed/*
+data/splits/*
+models/*
+reports/*
+logs/*
+
+# Ignore MLflow local SQLite databases
+mlruns/
+mlartifacts/
+*.db
+*.sqlite
+
+# Build caches
+dist/
+build/
+*.egg-info/
+.DS_Store
