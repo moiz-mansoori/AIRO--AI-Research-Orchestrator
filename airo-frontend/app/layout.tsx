@@ -14,8 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="antialiased font-sans bg-slate-50 text-slate-800">
-      <body className="min-h-screen flex flex-col md:flex-row bg-slate-50 overflow-x-hidden">
+    <html lang="en" className="antialiased font-sans bg-slate-50 text-slate-800" suppressHydrationWarning>
+      <body 
+        className="min-h-screen flex flex-col md:flex-row bg-slate-50 overflow-x-hidden"
+        suppressHydrationWarning
+      >
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <TopBar />
