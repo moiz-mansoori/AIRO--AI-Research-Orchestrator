@@ -63,10 +63,13 @@ AIRO/
 │   ├── shap_tools.py       # Explainability and feature importance plotting
 │   └── report_tools.py     # Jinja2 templating → Custom PDF rendering
 │
-├── frontend/               # Streamlit application dashboard
-│   ├── app.py              # Streamlit Multi-Page dashboard entry point
-│   ├── components/         # Shared UI pieces (Theme CSS, Sidebar)
-│   └── pages/              # Run Exp, Live Trace, Leaderboard, Report Viewer
+├── api/                    # FastAPI backend endpoints
+│   └── main.py             # Server bridging LangGraph and frontend
+│
+├── airo-frontend/          # Next.js 14 App Router frontend
+│   ├── app/                # Pages (Dashboard, Run, Trace, Leaderboard, Report)
+│   ├── components/         # React components (Zustand, Tailwind, Shadcn UI)
+│   └── store/              # Zustand global state for SSE and experiments
 │
 ├── data/                   # Dataset storage
 │   ├── raw/                # Drop datasets here
@@ -89,6 +92,11 @@ Ready to put me to work? It's easy!
 git clone https://github.com/moiz-mansoori/AIRO
 cd AIRO
 pip install -r requirements.txt
+
+# Install frontend dependencies
+cd airo-frontend
+npm install
+cd ..
 ```
 
 ### 2. Give Me a Brain (Free Groq API Key)
@@ -109,10 +117,19 @@ python -m orchestrator.runner --dataset data/raw/diabetes.csv --task classificat
 ```
 
 ### 4. Open My Dashboard
-Prefer a UI? Launch my Streamlit dashboard:
+Launch the FastAPI backend and Next.js frontend:
+
+Terminal 1 (Backend):
 ```bash
-streamlit run frontend/app.py
+python -m uvicorn api.main:app --port 8000
 ```
+
+Terminal 2 (Frontend):
+```bash
+cd airo-frontend
+npm run dev
+```
+Open your browser to `http://localhost:3000` (or 3001 if occupied).
 
 ### 5. View experiment tracking (MLflow UI)
 ```bash
@@ -175,7 +192,8 @@ I am built entirely on modern, production-ready python tooling:
 *   **Reasoning Engine:** Groq (LLaMA 3.3 70B via API)
 *   **Memory / Tracking:** MLflow (SQLite Backend)
 *   **Model Building:** Scikit-learn, XGBoost
-*   **Interface / Face:** Streamlit (Dark UI Theme)
+*   **Backend API:** FastAPI
+*   **Frontend UI:** Next.js 14, Tailwind CSS, Framer Motion, Zustand
 *   **Explainability:** SHAP
 *   **Report Generation:** Jinja2 & WeasyPrint
 *   **Testing:** Pytest & Pytest-Mock

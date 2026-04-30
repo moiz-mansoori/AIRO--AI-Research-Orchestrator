@@ -25,6 +25,8 @@ typer>=0.12.0           # CLI entrypoint: `airo --dataset ... --task ...`
 loguru>=0.7.0           # Structured logging across all agents
 tenacity>=9.0.0         # Retry decorator on Claude API calls (llm_tools.py)
 
-# Frontend dashboard 
-streamlit>=1.39.0       # Web dashboard: 4 pages (run, trace, leaderboard, report)
-plotly>=5.24.0          # Interactive charts in metric_chart.py component
+# Frontend dashboard & API
+plotly>=5.24.0          # Interactive charts (if needed for reporting)
+fastapi>=0.100.0        # API backend for Next.js
+uvicorn>=0.23.0         # ASGI server
+python-multipart        # Required for FastAPI file uploads
