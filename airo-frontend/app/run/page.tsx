@@ -34,6 +34,8 @@ export default function RunExperimentPage() {
             store.finishExperiment(res.result)
           } else if (res.status === 'failed') {
             store.failExperiment(res.errors || ['Unknown error occurred'])
+          } else if (res.status === 'not_found') {
+            store.failExperiment(['Experiment lost. The backend server might have restarted due to out-of-memory (OOM) on the free tier. Try a smaller dataset or "Fast" compute budget.'])
           }
         } catch (e) {
           console.error("Failed to poll status", e)
