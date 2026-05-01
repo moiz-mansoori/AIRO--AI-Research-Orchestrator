@@ -1,6 +1,4 @@
-# ==========================
 # 1. ENVIRONMENT & SECURITY
-# ==========================
 .env
 .env.local
 .env.development.local
@@ -12,9 +10,7 @@ secrets.json
 credentials.json
 client_secret.json
 
-# ==========================
 # 2. PYTHON & BACKEND
-# ==========================
 .venv/
 venv/
 airovenv/
@@ -26,9 +22,7 @@ __pycache__/
 .ruff_cache/
 .pytest_cache/
 
-# ==========================
 # 3. NEXT.JS & FRONTEND
-# ==========================
 node_modules/
 .next/
 out/
@@ -38,9 +32,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# ==========================
 # 4. MACHINE LEARNING & DATA
-# ==========================
 # Data & models (track with DVC instead)
 data/raw/*
 data/processed/*
@@ -57,9 +49,7 @@ mlartifacts/
 *.db
 *.sqlite
 
-# ==========================
 # 5. GENERATED ARTIFACTS
-# ==========================
 # Reports
 reports/*
 !reports/.gitkeep
@@ -77,9 +67,7 @@ dist/
 .ipynb_checkpoints/
 notebooks/.ipynb_checkpoints/
 
-# ==========================
 # 6. OS & IDE
-# ==========================
 .DS_Store
 Thumbs.db
 .vscode/

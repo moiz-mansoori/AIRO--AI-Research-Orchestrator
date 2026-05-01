@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { LogTerminal } from '@/components/trace/LogTerminal'
 import { useExperimentStore } from '@/store/experimentStore'
+import { airoApi } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Activity } from 'lucide-react'
 import Link from 'next/link'
@@ -19,7 +20,7 @@ export default function TracePage() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     setIsListening(true)
-    const eventSource = new EventSource(`http://localhost:8000/api/logs/${store.experimentId}`)
+    const eventSource = new EventSource(airoApi.getLogStreamUrl(store.experimentId))
     
     eventSource.onmessage = (e) => {
       setLogs(prev => [...prev, e.data])
