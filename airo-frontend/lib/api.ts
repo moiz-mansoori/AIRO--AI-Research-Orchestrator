@@ -14,7 +14,7 @@ export const airoApi = {
   },
 
   getStatus: async (experimentId: string) => {
-    const res = await api.get<{ status: 'running' | 'complete' | 'failed', result?: ExperimentResult, errors?: string[] }>(`/api/status/${experimentId}`)
+    const res = await api.get<{ status: 'running' | 'complete' | 'failed' | 'not_found', result?: ExperimentResult, errors?: string[] }>(`/api/status/${experimentId}`)
     return res.data
   },
 
