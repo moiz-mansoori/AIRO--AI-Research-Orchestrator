@@ -8,7 +8,36 @@ import { MetricCard } from '@/components/dashboard/MetricCard'
 import { airoApi } from '@/lib/api'
 
 export function ResultsPanel() {
-  const { result, resetExperiment } = useExperimentStore()
+  const { result, errors, resetExperiment } = useExperimentStore()
+
+  if (errors && errors.length > 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-red-50 border border-red-200 rounded-2xl p-6 shadow-sm flex flex-col items-start gap-4"
+      >
+        <div>
+          <h2 className="font-sans font-bold text-xl text-red-900 mb-1">Experiment Failed</h2>
+          <p className="font-sans text-sm text-red-700">The pipeline encountered an error and could not complete.</p>
+        </div>
+        
+        <div className="bg-white rounded-lg border border-red-100 p-4 w-full">
+          <ul className="list-disc pl-5 text-red-600 text-xs font-mono space-y-1">
+            {errors.map((err, i) => <li key={i}>{err}</li>)}
+          </ul>
+        </div>
+
+        <Button 
+          onClick={resetExperiment}
+          className="bg-red-600 hover:bg-red-700 text-white shadow-md gap-2"
+        >
+          <RefreshCw size={16} />
+          Try Again
+        </Button>
+      </motion.div>
+    )
+  }
 
   if (!result) return null
 
