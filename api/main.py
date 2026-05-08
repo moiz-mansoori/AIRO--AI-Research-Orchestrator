@@ -12,6 +12,11 @@ from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 
 from orchestrator.graph import compile_graph
 from orchestrator.state import AIROState, ComputeBudget, TaskType
+from loguru import logger
+
+# Route logs to file so Live Trace can see them
+Path("logs").mkdir(exist_ok=True)
+logger.add("logs/airo.log", mode="a", enqueue=True)
 
 app = FastAPI(title="AIRO API")
 
@@ -38,6 +43,10 @@ def run_pipeline_sync(state: AIROState):
             pass
             
         final_state = graph.invoke(state, config={"recursion_limit": 50})
+        
+        # Ensure final_state is an AIROState object (LangGraph sometimes returns a dict)
+        if isinstance(final_state, dict):
+            final_state = AIROState(**final_state)
         
         EXPERIMENTS[state.experiment_id]["status"] = "complete"
         EXPERIMENTS[state.experiment_id]["result"] = {
@@ -103,8 +112,8 @@ async def log_generator(experiment_id: str):
         log_file.write_text("")
         
     with open(log_file, "r", encoding="utf-8") as f:
-        # Seek to end so we only get NEW logs for this run
-        f.seek(0, 2)
+        # Start from beginning so user sees full progress
+        f.seek(0)
         
         while True:
             line = f.readline()
