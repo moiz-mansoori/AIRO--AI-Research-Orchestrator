@@ -7,7 +7,7 @@ AIRO automates the entire machine learning experimentation workflow using an orc
 ---
 
 ## 🌐 Live Production Deployment
-- **Frontend Dashboard:** [https://airo-frontend-app.vercel.app/](https://airo-frontend-app.vercel.app/)
+- **Frontend Dashboard:** [https://airo-ai-research-orchestrator.vercel.app/](https://airo-ai-research-orchestrator.vercel.app/)
 - **Backend API (Swagger UI):** [https://airo-ai-research-orchestrator.onrender.com/docs](https://airo-ai-research-orchestrator.onrender.com/docs)
 
 ---
