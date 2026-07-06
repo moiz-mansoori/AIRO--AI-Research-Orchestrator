@@ -29,6 +29,20 @@ export const airoApi = {
     return res.data
   },
 
+  getReportCharts: async (experimentId: string) => {
+    const res = await api.get<{
+      best_model_type: string
+      best_run_id: string
+      shap: { feature: string; importance: number }[]
+      learning_curve: {
+        train_sizes: number[]
+        train_scores: number[]
+        val_scores: number[]
+      } | null
+    }>(`/api/report/${experimentId}/charts`)
+    return res.data
+  },
+
   getLogStreamUrl: (experimentId: string) => {
     return `${API_BASE_URL}/api/logs/${experimentId}`
   },

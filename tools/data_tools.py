@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder, StandardScaler, OrdinalEncoder
 
 from orchestrator.state import DataQualityReport, TaskType
 
@@ -84,38 +84,21 @@ def clean_dataset(
     """
     Returns (cleaned_df, feature_schema).
     feature_schema maps column name → dtype string.
+    Only handles dropping duplicates and basic type normalization.
+    Imputation, scaling, and encoding are handled inside split_dataset
+    to completely prevent data leakage.
     """
     df = df.drop_duplicates().reset_index(drop=True)
+
+    # We construct the schema based on raw types (which lets the Config Agent
+    # know what features are categorical/objects vs float/int numeric)
+    feature_schema = {col: str(df[col].dtype) for col in df.columns}
 
     feature_cols = [c for c in df.columns if c != target_col]
     numeric_cols  = df[feature_cols].select_dtypes(include=[np.number]).columns.tolist()
     cat_cols      = df[feature_cols].select_dtypes(exclude=[np.number]).columns.tolist()
 
-    # Impute
-    for col in numeric_cols:
-        if df[col].isnull().any():
-            df[col] = df[col].fillna(df[col].median())
-
-    for col in cat_cols:
-        if df[col].isnull().any():
-            df[col] = df[col].fillna(df[col].mode()[0])
-
-    # Encode categoricals
-    le = LabelEncoder()
-    for col in cat_cols:
-        df[col] = le.fit_transform(df[col].astype(str))
-
-    # Encode target for classification
-    if task_type == TaskType.CLASSIFICATION and df[target_col].dtype == object:
-        df[target_col] = le.fit_transform(df[target_col].astype(str))
-
-    # Scale numerics (fit on full df here; re-fit on train only in training agent)
-    scaler = StandardScaler()
-    if numeric_cols:
-        df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
-
-    feature_schema = {col: str(df[col].dtype) for col in df.columns}
-    logger.info(f"Cleaned dataset: {len(numeric_cols)} numeric, {len(cat_cols)} categorical features")
+    logger.info(f"Cleaned dataset (raw): {len(numeric_cols)} numeric, {len(cat_cols)} categorical features")
     return df, feature_schema
 
 # Split 
@@ -126,7 +109,12 @@ def split_dataset(
     out_dir: str,
     random_state: int = 42,
 ) -> dict[str, int]:
-    """Stratified 70/15/15 split. Saves parquet files. Returns split sizes."""
+    """
+    Stratified 70/15/15 split. Imputes, encodes, and scales the splits
+    by fitting ONLY on the training split, and applying (transforming) 
+    to val/test splits to prevent data leakage.
+    Saves parquet files. Returns split sizes.
+    """
     X = df.drop(columns=[target_col])
     y = df[target_col]
 
@@ -154,6 +142,56 @@ def split_dataset(
             X_tmp, y_tmp, test_size=0.50, random_state=random_state, stratify=None
         )
 
+    # Preprocessing: Imputation, Encoding, Scaling (fit on train, transform on val/test)
+    feature_cols = X_train.columns.tolist()
+    numeric_cols  = X_train.select_dtypes(include=[np.number]).columns.tolist()
+    cat_cols      = X_train.select_dtypes(exclude=[np.number]).columns.tolist()
+
+    # 1. Imputation
+    # Numeric imputation using train median
+    for col in numeric_cols:
+        if X_train[col].isnull().any() or X_val[col].isnull().any() or X_test[col].isnull().any():
+            median_val = X_train[col].median()
+            # If median_val is NaN (all values in train are NaN), fallback to 0.0
+            if pd.isna(median_val):
+                median_val = 0.0
+            X_train[col] = X_train[col].fillna(median_val)
+            X_val[col] = X_val[col].fillna(median_val)
+            X_test[col] = X_test[col].fillna(median_val)
+
+    # Categorical imputation using train mode
+    for col in cat_cols:
+        if X_train[col].isnull().any() or X_val[col].isnull().any() or X_test[col].isnull().any():
+            mode_series = X_train[col].mode()
+            mode_val = mode_series[0] if not mode_series.empty else "missing"
+            X_train[col] = X_train[col].fillna(mode_val)
+            X_val[col] = X_val[col].fillna(mode_val)
+            X_test[col] = X_test[col].fillna(mode_val)
+
+    # 2. Categorical features encoding using OrdinalEncoder (safe unseen category handling)
+    if cat_cols:
+        oe = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
+        # Convert to string to avoid comparison issues with mixed types
+        X_train[cat_cols] = oe.fit_transform(X_train[cat_cols].astype(str))
+        X_val[cat_cols]   = oe.transform(X_val[cat_cols].astype(str))
+        X_test[cat_cols]  = oe.transform(X_test[cat_cols].astype(str))
+
+    # 3. Target column encoding for classification
+    if task_type == TaskType.CLASSIFICATION:
+        le = LabelEncoder()
+        # Convert target to string before encoding
+        y_train = pd.Series(le.fit_transform(y_train.astype(str)), index=y_train.index, name=target_col)
+        y_val   = pd.Series(le.transform(y_val.astype(str)), index=y_val.index, name=target_col)
+        y_test  = pd.Series(le.transform(y_test.astype(str)), index=y_test.index, name=target_col)
+
+    # 4. Standard Scaling of numeric features
+    if numeric_cols:
+        scaler = StandardScaler()
+        X_train[numeric_cols] = scaler.fit_transform(X_train[numeric_cols])
+        X_val[numeric_cols]   = scaler.transform(X_val[numeric_cols])
+        X_test[numeric_cols]  = scaler.transform(X_test[numeric_cols])
+
+    # Save to out_dir
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 

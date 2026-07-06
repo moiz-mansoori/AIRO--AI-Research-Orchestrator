@@ -95,7 +95,13 @@ export default function Home() {
 
       {/* Agent Pipeline Strip */}
       <section className="mb-10">
-        <h2 className="font-sans font-semibold text-lg text-slate-800 mb-4">Pipeline Architecture</h2>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center text-cyan-600">
+            <span className="font-mono text-xs">🛠️</span>
+          </div>
+          <h2 className="font-sans font-semibold text-lg text-slate-800">Pipeline Architecture</h2>
+          <div className="flex-1 h-px bg-slate-200/80 ml-4" />
+        </div>
         <AgentPipeline />
       </section>
 

@@ -31,7 +31,7 @@ export function ExperimentCard({ experimentId, bestModelType, bestMetric, verdic
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay, ease: 'easeOut' }}
-      className="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-xl hover:shadow-cyan-sm transition-all"
+      className="flex items-center justify-between p-4 bg-white border border-slate-200/80 rounded-xl hover:shadow-cyan-sm hover:border-cyan-300 hover:-translate-y-[1px] transition-all duration-200"
     >
       <div className="flex flex-col gap-1">
         <span className="font-mono text-xs text-cyan-600 font-medium">

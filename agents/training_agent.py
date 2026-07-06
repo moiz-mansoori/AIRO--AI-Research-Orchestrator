@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import time
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import mlflow
@@ -97,11 +98,14 @@ def _train_single(
         # Learning curve
         try:
             curve_data = compute_learning_curve(model, X_train.values, y_train.values, state.task_type)
-            curve_path = f"reports/{state.experiment_id}/learning_curves/{result.run_id}_curve.png"
-            save_learning_curve_plot(curve_data, curve_path, config.model_type)
+            curve_path = f"reports/{state.experiment_id}/learning_curves/{result.run_id}_curve.json"
+            Path(curve_path).parent.mkdir(parents=True, exist_ok=True)
+            with open(curve_path, "w", encoding="utf-8") as f:
+                import json
+                json.dump(curve_data, f)
             mlflow.log_artifact(curve_path, artifact_path="learning_curves")
-        except Exception:
-            pass  # learning curves are nice-to-have
+        except Exception as exc:
+            logger.warning(f"[train] Learning curve calculation failed: {exc}")
 
         result.model_artifact_path = save_model(model, result.run_id)
         result.status = "COMPLETED"
@@ -129,10 +133,11 @@ def training_agent_node(state: AIROState) -> AIROState:
 
     logger.info(f"[train] Training {len(state.configs)} configs with {max_workers} workers")
 
+    import contextvars
     results: list[TrainingResult] = []
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
         futures = {
-            pool.submit(_train_single, cfg, state, experiment_name, splits_dir): cfg
+            pool.submit(contextvars.copy_context().run, _train_single, cfg, state, experiment_name, splits_dir): cfg
             for cfg in state.configs
         }
         for future in as_completed(futures):

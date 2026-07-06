@@ -34,10 +34,10 @@ export function Sidebar() {
   }, [pathname]) // Refresh count on navigation
 
   return (
-    <aside className="hidden md:flex w-64 flex-col bg-white border-r border-cyan-100 shadow-sm h-screen sticky top-0">
+    <aside className="hidden md:flex w-64 flex-col bg-white border-r border-slate-200/60 shadow-sm h-screen sticky top-0">
       
       {/* Brand Block */}
-      <div className="p-6 pb-8 border-b border-cyan-50/50">
+      <div className="p-6 pb-8 border-b border-slate-100">
         <div className="flex items-center gap-3 mb-1">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white shadow-sm">
             <Microscope size={18} />
@@ -77,7 +77,7 @@ export function Sidebar() {
       </nav>
 
       {/* Footer Stats Block */}
-      <div className="p-4 bg-slate-50 border-t border-cyan-100 mt-auto">
+      <div className="p-4 bg-slate-50 border-t border-slate-200 mt-auto">
         <div className="space-y-2 mb-4">
           <div className="flex justify-between items-center">
             <span className="font-sans text-xs text-slate-500">Experiments run</span>

@@ -18,11 +18,22 @@ from loguru import logger
 Path("logs").mkdir(exist_ok=True)
 logger.add("logs/airo.log", mode="a", enqueue=True)
 
+# Custom sink to write experiment-specific logs
+def experiment_log_sink(message):
+    record = message.record
+    experiment_id = record["extra"].get("experiment_id")
+    if experiment_id:
+        log_file = Path("logs") / f"airo_{experiment_id}.log"
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(str(message))
+
+logger.add(experiment_log_sink, enqueue=True)
+
 app = FastAPI(title="AIRO API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow Vercel frontend to communicate with Render backend
+    allow_origins=["*"], # Allow frontend to communicate with Render backend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -39,10 +50,11 @@ def run_pipeline_sync(state: AIROState):
         
         # Ensure log file exists and append empty to trigger tail
         Path("logs").mkdir(exist_ok=True)
-        with open("logs/airo.log", "a") as f:
-            pass
+        log_file = Path("logs") / f"airo_{state.experiment_id}.log"
+        log_file.write_text("")
             
-        final_state = graph.invoke(state, config={"recursion_limit": 50})
+        with logger.contextualize(experiment_id=state.experiment_id):
+            final_state = graph.invoke(state, config={"recursion_limit": 50})
         
         # Ensure final_state is an AIROState object (LangGraph sometimes returns a dict)
         if isinstance(final_state, dict):
@@ -107,7 +119,10 @@ async def get_status(experiment_id: str):
 
 
 async def log_generator(experiment_id: str):
-    log_file = Path("logs/airo.log")
+    log_file = Path("logs") / f"airo_{experiment_id}.log"
+    
+    # Wait for the file to be created, or create it empty
+    Path("logs").mkdir(exist_ok=True)
     if not log_file.exists():
         log_file.write_text("")
         
@@ -122,6 +137,10 @@ async def log_generator(experiment_id: str):
             else:
                 status = EXPERIMENTS.get(experiment_id, {}).get("status", "running")
                 if status in ("complete", "failed"):
+                    # Check one last time for any residual logs
+                    line = f.readline()
+                    if line:
+                        yield f"data: {line.strip()}\n\n"
                     break
                 await asyncio.sleep(0.5)
 
@@ -168,3 +187,12 @@ async def get_report_markdown(experiment_id: str):
     if md_path.exists():
         return PlainTextResponse(md_path.read_text(encoding="utf-8"))
     return {"error": "Not found"}
+
+
+@app.get("/api/report/{experiment_id}/charts")
+async def get_report_charts(experiment_id: str):
+    json_path = Path(f"reports/{experiment_id}/metrics_data.json")
+    if json_path.exists():
+        return FileResponse(json_path, media_type="application/json")
+    from fastapi import HTTPException
+    raise HTTPException(status_code=404, detail="Chart metrics not found")

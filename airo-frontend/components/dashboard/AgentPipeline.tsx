@@ -22,10 +22,10 @@ export function AgentPipeline({ activeAgent = '' }: { activeAgent?: string }) {
             <div key={agent.id} className="flex items-center gap-2">
               <div 
                 className={`
-                  flex flex-col px-4 py-3 rounded-xl border transition-all duration-300
+                  flex flex-col px-4 py-3 rounded-xl border transition-all duration-200
                   ${isActive 
                     ? 'border-cyan-400 bg-cyan-50 shadow-cyan-glow' 
-                    : 'border-cyan-100 bg-white'
+                    : 'border-slate-200/80 bg-white hover:border-cyan-300 hover:shadow-cyan-sm'
                   }
                 `}
               >

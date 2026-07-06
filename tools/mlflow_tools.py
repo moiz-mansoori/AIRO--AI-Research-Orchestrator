@@ -57,14 +57,28 @@ def log_metrics(
     mlflow.log_metrics({f"val_{k}":   v for k, v in val_metrics.items()})
 
 def save_model(model: Any, run_id: str, models_dir: str = "models") -> str:
-    """Pickle the model and log it as an MLflow artifact."""
+    """Pickle the model locally and log it natively to MLflow (sklearn/xgboost)."""
     out_dir = Path(models_dir) / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
     model_path = out_dir / "model.pkl"
     with open(model_path, "wb") as f:
         pickle.dump(model, f)
-    mlflow.log_artifact(str(model_path), artifact_path="model")
-    logger.debug(f"Model saved: {model_path}")
+
+    # Native MLflow logging with flavor selection
+    model_class_name = type(model).__name__
+    try:
+        if "XGB" in model_class_name:
+            import mlflow.xgboost
+            mlflow.xgboost.log_model(model, artifact_path="model")
+        else:
+            import mlflow.sklearn
+            mlflow.sklearn.log_model(model, artifact_path="model")
+        logger.debug(f"Logged native MLflow model under artifact_path='model'")
+    except Exception as exc:
+        logger.warning(f"Native MLflow model logging failed ({exc}). Logging file artifact as fallback.")
+        mlflow.log_artifact(str(model_path), artifact_path="model")
+
+    logger.debug(f"Model saved locally: {model_path}")
     return str(model_path)
 
 def load_model(run_id: str, models_dir: str = "models") -> Any:

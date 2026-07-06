@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { MarkdownViewer } from '@/components/report/MarkdownViewer'
+import { InteractiveCharts } from '@/components/report/InteractiveCharts'
 import { useExperimentStore } from '@/store/experimentStore'
 import { airoApi } from '@/lib/api'
 import { FileSearch, Loader2 } from 'lucide-react'
@@ -82,7 +83,10 @@ function ReportContent() {
             <p className="text-sm opacity-80">The requested report could not be loaded or has not been generated yet.</p>
           </div>
         ) : (
-          <MarkdownViewer content={content} experimentId={targetId} />
+          <>
+            <MarkdownViewer content={content} experimentId={targetId} />
+            <InteractiveCharts experimentId={targetId} />
+          </>
         )}
       </div>
     </PageWrapper>

@@ -37,7 +37,14 @@ graph TD
 3. **Training Agents:** "We spin up a ThreadPoolExecutor and train all those configs in parallel. Heavy lifting is our specialty."
 4. **Critic Agent:** "I audit every model. Overfitting? Data leakage? Suspicious metrics? I'll find it, flag it, and fail the model before it reaches production."
 5. **Evaluator Agent:** "I rank the surviving models on a leaderboard and calculate exactly how much better we did than a naive baseline."
-6. **Reporter Agent:** "I compile the entire experiment into a beautiful PDF and Markdown report, complete with SHAP explainability plots and executive recommendations."
+6. **Reporter Agent:** "I compile the entire experiment into a beautiful PDF and Markdown report, exporting raw metrics for horizontal SHAP feature importance and learning curves."
+
+### 🌟 Technical Highlights & Engineering Depth
+To demonstrate production-grade MLOps and software engineering standards, the following architectural upgrades are implemented:
+- **Leak-Free Preprocessing:** Imputation, standard scaling, and ordinal encoding are fitted strictly on the training split and transformed on the validation/test splits, mathematically eliminating standard ML data leakage.
+- **Isolated Concurrent Logging:** Uses thread-safe dynamic Loguru sinks combined with ContextVar copying across ThreadPoolExecutor workers to route outputs to individual files (`logs/airo_{experiment_id}.log`), preventing interleaved log streams when multiple experiments run concurrently.
+- **MLflow Native Model Logging:** Registers models natively using `mlflow.xgboost.log_model` or `mlflow.sklearn.log_model` with automatic python environment pinning and schema signature inference.
+- **Interactive Visualizations:** Upgraded static Matplotlib `.png` generation by exporting raw metric JSON files and rendering them dynamically on the frontend via interactive, client-side **Recharts** canvas blocks.
 
 ---
 
@@ -192,16 +199,16 @@ OLLAMA_BASE_URL=http://localhost:11434
 
 ## Tech Stack
 
-I am built entirely on modern, production-ready python tooling:
+I am built entirely on modern, production-ready developer tooling:
 
 *   **Brain / Orchestration:** LangGraph 0.2+
 *   **Reasoning Engine:** Groq (LLaMA 3.3 70B via API)
-*   **Memory / Tracking:** MLflow (SQLite Backend)
+*   **Memory / Tracking:** MLflow (SQLite Backend, Native Model Registry)
 *   **Model Building:** Scikit-learn, XGBoost
 *   **Backend API:** FastAPI
-*   **Frontend UI:** Next.js 14, Tailwind CSS, Framer Motion, Zustand
-*   **Explainability:** SHAP
-*   **Report Generation:** Jinja2 & WeasyPrint
+*   **Frontend UI:** Next.js 16 (App Router), Tailwind CSS v4, Recharts, Framer Motion, Zustand
+*   **Explainability:** SHAP (JSON metrics payload)
+*   **Report Generation:** Jinja2 & WeasyPrint (Markdown / PDF formatting)
 *   **Testing:** Pytest & Pytest-Mock
 
 ---

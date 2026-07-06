@@ -39,10 +39,34 @@ def reporter_agent_node(state: AIROState) -> AIROState:
             X_val    = val_df.drop(columns=[target])
             sv       = compute_shap_values(model, X_val)
             shap_top = top_features(sv, X_val.columns.tolist())
-            shap_path = str(report_dir / "shap_summary.png")
-            save_shap_summary_plot(sv, X_val, shap_path, title=f"SHAP — {state.best_model_type}")
         except Exception as exc:
             logger.warning(f"[report] SHAP skipped: {exc}")
+
+    # Compile raw metrics (SHAP and Learning Curves) into a unified JSON file
+    metrics_data = {
+        "best_model_type": state.best_model_type,
+        "best_run_id": state.best_run_id,
+        "shap": shap_top,
+        "learning_curve": None
+    }
+    if state.best_run_id:
+        try:
+            import json
+            curve_json_path = Path(f"reports/{state.experiment_id}/learning_curves/{state.best_run_id}_curve.json")
+            if curve_json_path.exists():
+                with open(curve_json_path, "r", encoding="utf-8") as f:
+                    metrics_data["learning_curve"] = json.load(f)
+        except Exception as exc:
+            logger.warning(f"[report] Failed to load learning curve JSON: {exc}")
+
+    try:
+        import json
+        metrics_data_path = report_dir / "metrics_data.json"
+        with open(metrics_data_path, "w", encoding="utf-8") as f:
+            json.dump(metrics_data, f, indent=2)
+        logger.info(f"[report] Saved unified metrics JSON to {metrics_data_path}")
+    except Exception as exc:
+        logger.warning(f"[report] Failed to save metrics JSON: {exc}")
 
     # 2-4. Parallel LLM calls — all 3 are independent
     exec_summary = ""
@@ -105,11 +129,12 @@ def reporter_agent_node(state: AIROState) -> AIROState:
             leaderboard_summary=leaderboard_summary,
         )
 
+    import contextvars
     with ThreadPoolExecutor(max_workers=3) as pool:
         futures = {
-            pool.submit(_get_exec_summary):    "summary",
-            pool.submit(_get_recommendations): "recs",
-            pool.submit(_get_reasoning):       "reasoning",
+            pool.submit(contextvars.copy_context().run, _get_exec_summary):    "summary",
+            pool.submit(contextvars.copy_context().run, _get_recommendations): "recs",
+            pool.submit(contextvars.copy_context().run, _get_reasoning):       "reasoning",
         }
         for future in as_completed(futures):
             name = futures[future]
